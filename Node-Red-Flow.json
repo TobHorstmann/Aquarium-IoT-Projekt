@@ -1,0 +1,448 @@
+[
+    {
+        "id": "3b6158a12b78125c",
+        "type": "tab",
+        "label": "Aquarium-Projekt",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "bc13cf517fd898ba",
+        "type": "mqtt in",
+        "z": "3b6158a12b78125c",
+        "name": "Aquarium",
+        "topic": "Aquarium/Sensorwerte",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5fac081571b16f88",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "059c25e8e91eb8f6",
+                "16048d13a5c3de4d",
+                "f23722b32d61a78d",
+                "9287d0d4b41bc0b9"
+            ]
+        ]
+    },
+    {
+        "id": "059c25e8e91eb8f6",
+        "type": "function",
+        "z": "3b6158a12b78125c",
+        "name": "Füllstand",
+        "func": "var fuellstand = {payload: msg.payload.Fuellstand};\nreturn fuellstand;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 300,
+        "wires": [
+            [
+                "ae3908706c2889d5",
+                "0543876ed6d631e8"
+            ]
+        ]
+    },
+    {
+        "id": "ae3908706c2889d5",
+        "type": "ui_gauge",
+        "z": "3b6158a12b78125c",
+        "name": "",
+        "group": "6e6edc796dd7cda4",
+        "order": 3,
+        "width": 7,
+        "height": 5,
+        "gtype": "wave",
+        "title": "Füllstand [cm]",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "min": 0,
+        "max": "12.5",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 640,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "0543876ed6d631e8",
+        "type": "debug",
+        "z": "3b6158a12b78125c",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "16048d13a5c3de4d",
+        "type": "function",
+        "z": "3b6158a12b78125c",
+        "name": "Temperatur",
+        "func": "var temperatur = {payload: msg.payload.Temperatur};\nreturn temperatur;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 220,
+        "wires": [
+            [
+                "0543876ed6d631e8",
+                "13cb6cade5b33299"
+            ]
+        ]
+    },
+    {
+        "id": "13cb6cade5b33299",
+        "type": "ui_chart",
+        "z": "3b6158a12b78125c",
+        "name": "",
+        "group": "6e6edc796dd7cda4",
+        "order": 4,
+        "width": 7,
+        "height": 5,
+        "label": "Temperatur",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "25",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 630,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f23722b32d61a78d",
+        "type": "function",
+        "z": "3b6158a12b78125c",
+        "name": "Datenbank-Übertragung",
+        "func": "let temperatur = msg.payload.Temperatur;\nlet fuellstand = msg.payload.Fuellstand;\nlet status_pumpe = msg.payload.Status_Pumpe\n\n//\nlet now = new Date();\nnow.setHours(now.getHours() + 2);\nlet timestamp = now.toISOString().replace(\"T\", \" \").substring(0, 19);\n\nmsg.topic = \"INSERT INTO sensorwerte (Zeit, Temperatur, Fuellstand, StatusPumpe) VALUES (?, ?, ?,?)\";\nmsg.payload = [timestamp, temperatur, fuellstand, status_pumpe];\n\nreturn msg;\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 460,
+        "wires": [
+            [
+                "9bb451123bcd054e"
+            ]
+        ]
+    },
+    {
+        "id": "9bb451123bcd054e",
+        "type": "mysql",
+        "z": "3b6158a12b78125c",
+        "mydb": "9d7c1eced8ac29c5",
+        "name": "Datenbank_Aquarium",
+        "x": 660,
+        "y": 460,
+        "wires": [
+            [
+                "ad221bb8e2bd14dc"
+            ]
+        ]
+    },
+    {
+        "id": "ba061afe99d047e9",
+        "type": "ui_text",
+        "z": "3b6158a12b78125c",
+        "group": "6e6edc796dd7cda4",
+        "order": 1,
+        "width": 7,
+        "height": 1,
+        "name": "",
+        "label": "Status Pumpe ",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "20",
+        "color": "#19e631",
+        "x": 640,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "9287d0d4b41bc0b9",
+        "type": "function",
+        "z": "3b6158a12b78125c",
+        "name": "Status Meldung An/Aus",
+        "func": "var status_pumpe = {payload: msg.payload.Status_Pumpe};\nreturn status_pumpe;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 380,
+        "wires": [
+            [
+                "ba061afe99d047e9",
+                "0543876ed6d631e8"
+            ]
+        ]
+    },
+    {
+        "id": "ad221bb8e2bd14dc",
+        "type": "debug",
+        "z": "3b6158a12b78125c",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "d0fc9b78d1814648",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "56e441d11f4bb0c7",
+        "order": 4,
+        "width": 8,
+        "height": 1
+    },
+    {
+        "id": "bca6863536fe2817",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "56e441d11f4bb0c7",
+        "order": 5,
+        "width": 8,
+        "height": 1
+    },
+    {
+        "id": "35c8eed13de774c9",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "56e441d11f4bb0c7",
+        "order": 6,
+        "width": 8,
+        "height": 1
+    },
+    {
+        "id": "7fef9950057f545a",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "56e441d11f4bb0c7",
+        "order": 7,
+        "width": 8,
+        "height": 1
+    },
+    {
+        "id": "3edbf66093c6962d",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "56e441d11f4bb0c7",
+        "order": 8,
+        "width": 20,
+        "height": 1
+    },
+    {
+        "id": "c283a1035e81ee86",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "56e441d11f4bb0c7",
+        "order": 10,
+        "width": 18,
+        "height": 1
+    },
+    {
+        "id": "8bbef89aa61ae51a",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "6e6edc796dd7cda4",
+        "order": 2,
+        "width": 13,
+        "height": 1
+    },
+    {
+        "id": "409a5f204e033e09",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "6e6edc796dd7cda4",
+        "order": 5,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "d412f1f0911bdf26",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "6e6edc796dd7cda4",
+        "order": 6,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "77bec1da09a5d0ca",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "6e6edc796dd7cda4",
+        "order": 7,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "287640d32409a125",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "6e6edc796dd7cda4",
+        "order": 8,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "b3d6f3ae0fe88059",
+        "type": "ui_spacer",
+        "z": "3b6158a12b78125c",
+        "name": "spacer",
+        "group": "6e6edc796dd7cda4",
+        "order": 9,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "5fac081571b16f88",
+        "type": "mqtt-broker",
+        "name": "Aquarium",
+        "broker": "127.0.0.1",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6e6edc796dd7cda4",
+        "type": "ui_group",
+        "name": "Aquarium",
+        "tab": "33f34b0409469af8",
+        "order": 1,
+        "disp": true,
+        "width": 20,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9d7c1eced8ac29c5",
+        "type": "MySQLdatabase",
+        "name": "Daten_Aquarium",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "Daten_Aquarium",
+        "tz": "+1",
+        "charset": "UTF8"
+    },
+    {
+        "id": "56e441d11f4bb0c7",
+        "type": "ui_group",
+        "name": "ESP32",
+        "tab": "",
+        "order": 3,
+        "disp": true,
+        "width": "20",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "33f34b0409469af8",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
